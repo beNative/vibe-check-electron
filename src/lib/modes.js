@@ -78,6 +78,27 @@ the P5.js code, nothing else, no commentary.`),
       {
         label: '🚲 pelican riding bicycle',
         prompt: 'a pelican riding a bicycle'
+      },
+      {
+        label: '🌌 starfield',
+        prompt: 'a starfield with parallax effect on mouse move'
+      },
+      {
+        label: '🎶 music visualizer',
+        prompt:
+          'a simple music visualizer with geometric shapes that react to sound (simulated)'
+      },
+      {
+        label: '👾 game of life',
+        prompt: "Conway's Game of Life simulation"
+      },
+      {
+        label: '🖋️ drawing machine',
+        prompt: 'a generative drawing machine that creates abstract patterns'
+      },
+      {
+        label: '🧬 DNA',
+        prompt: 'an animated DNA double helix'
       }
     ]
   },
@@ -145,6 +166,26 @@ no commentary.`),
       {
         label: '🤖 robot',
         prompt: 'a robot'
+      },
+      {
+        label: '🗺️ fantasy map',
+        prompt: 'a detailed fantasy map with mountains, forests, and rivers'
+      },
+      {
+        label: '⚙️ clockwork',
+        prompt: 'the inner workings of a clock with gears'
+      },
+      {
+        label: '🦁 lion',
+        prompt: 'a majestic lion face'
+      },
+      {
+        label: '🚀 rocket launch',
+        prompt: 'a rocket launching into space with smoke'
+      },
+      {
+        label: '📚 bookshelf',
+        prompt: 'a bookshelf filled with colorful books'
       }
     ]
   },
@@ -208,6 +249,26 @@ graphics. Return ONLY the HTML page, nothing else, no commentary.`),
       {
         label: '🧠 memory game',
         prompt: 'a memory game'
+      },
+      {
+        label: '🎹 piano',
+        prompt: 'a playable piano keyboard with interactive keys'
+      },
+      {
+        label: '💬 chat interface',
+        prompt: 'a simulated chat application interface'
+      },
+      {
+        label: '🎲 dice roller',
+        prompt: 'a dice roller with 3D animated dice'
+      },
+      {
+        label: '📖 digital book',
+        prompt: 'a digital book with flippable pages'
+      },
+      {
+        label: '📈 stock ticker',
+        prompt: 'a simulated stock ticker with changing values'
       }
     ]
   },
@@ -269,6 +330,26 @@ code with embedded JS, nothing else, no commentary.`),
       {
         label: '🌳 trees',
         prompt: 'a 3D terrain with trees and blue sky'
+      },
+      {
+        label: '🚗 car',
+        prompt: 'a simple 3D car model made from primitive shapes'
+      },
+      {
+        label: '💡 lamp',
+        prompt: 'a 3D desk lamp that can be aimed with the mouse'
+      },
+      {
+        label: '🪐 solar system',
+        prompt: 'a simple animated model of the solar system'
+      },
+      {
+        label: '🌀 tornado',
+        prompt: 'an animated tornado made of particles'
+      },
+      {
+        label: '💎 crystal',
+        prompt: 'a rotating, reflective crystal with custom shaders'
       }
     ]
   },
@@ -278,11 +359,27 @@ code with embedded JS, nothing else, no commentary.`),
     emoji: '🖼️',
     syntax: 'image',
     systemInstruction: f(`\
-You are an expert at turning text prompts into images. When given a prompt, you will
-use your creativity to create a ${outputWidth}x${outputHeight} image that perfectly
-satisfies the prompt.`),
+You are an expert image editor. Given an input image and a prompt, you will use your
+creativity to edit the image to perfectly satisfy the prompt. The output must be a
+${outputWidth}x${outputHeight} image.`),
     getTitle: s => s,
     imageOutput: true,
-    presets: []
+    presets: [
+      {label: 'make it pop art', prompt: 'make it pop art'},
+      {
+        label: 'add sunglasses',
+        prompt: 'add cool sunglasses to the main subject'
+      },
+      {label: 'turn it into a sketch', prompt: 'turn it into a pencil sketch'},
+      {
+        label: 'make it futuristic',
+        prompt: 'make it look futuristic and cyberpunk'
+      },
+      {label: 'add a cat', prompt: 'add a cat somewhere in the image'},
+      {
+        label: 'change season to winter',
+        prompt: 'change the season in the image to winter'
+      }
+    ]
   }
 }

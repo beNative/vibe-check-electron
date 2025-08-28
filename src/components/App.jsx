@@ -15,6 +15,7 @@ import {
   setBatchModel,
   setBatchSize,
   setVersusModel,
+  setVersusModels,
   reset
 } from '../lib/actions'
 import {isTouch, isIframe} from '../lib/consts'
@@ -64,6 +65,34 @@ export default function App() {
   const toggleTheme = useCallback(() => {
     setIsDark(!isDark)
   }, [isDark])
+
+  const handleRandomizeModels = () => {
+    const compatibleModels = Object.keys(models).filter(key =>
+      outputMode === 'image'
+        ? models[key].imageOutput
+        : !models[key].imageOutput
+    )
+
+    if (compatibleModels.length === 0) return
+
+    if (batchMode) {
+      const randomModel = shuffle(compatibleModels)[0]
+      setBatchModel(randomModel)
+    } else {
+      const shuffled = shuffle(compatibleModels)
+      if (shuffled.length < 2) {
+        setVersusModels(shuffled)
+      } else {
+        const count =
+          Math.floor(Math.random() * (shuffled.length - 1)) + 2
+        const selected = shuffled.slice(0, count)
+        setVersusModels(selected)
+      }
+    }
+    if (batchMode) {
+      setShowModels(false)
+    }
+  }
 
   useEffect(() => {
     shufflePresets()
@@ -135,23 +164,13 @@ export default function App() {
           </p>
           <div className={c('selector', {active: showModes})}>
             <ul>
-              {Object.keys(modes)
-                .filter(key => key !== 'image')
-                .map(key => (
+              {Object.keys(modes).map(key => (
                   <li key={key}>
                     <button
                       className={c('chip', {primary: key === outputMode})}
                       onClick={() => {
                         setOutputMode(key)
                         setShowModes(false)
-
-                        if (key === 'image') {
-                          setBatchModel(
-                            Object.keys(models).find(k => models[k].imageOutput)
-                          )
-                        } else if (outputMode === 'image') {
-                          setBatchModel(Object.keys(models)[1])
-                        }
                       }}
                     >
                       {modes[key].emoji} {modes[key].name}
@@ -185,10 +204,22 @@ export default function App() {
                   .length + ' selected'}
           </p>
           <div className={c('selector', {active: showModels})}>
-            <ul>
-              {Object.keys(models)
-                .filter(key => !models[key].imageOutput)
-                .map(key => (
+            <ul className="wrapped">
+              <li>
+                <button
+                  className="chip primary"
+                  onClick={handleRandomizeModels}
+                >
+                  <span className="icon">casino</span>
+                  Randomize
+                </button>
+              </li>
+              {Object.keys(models).map(key => {
+                const isCompatible =
+                  outputMode === 'image'
+                    ? models[key].imageOutput
+                    : !models[key].imageOutput
+                return (
                   <li key={key}>
                     <button
                       className={c('chip', {
@@ -196,6 +227,7 @@ export default function App() {
                           ? key === batchModel
                           : versusModels[key]
                       })}
+                      disabled={!isCompatible}
                       onClick={() => {
                         if (batchMode) {
                           setBatchModel(key)
@@ -205,10 +237,14 @@ export default function App() {
                         }
                       }}
                     >
+                      {models[key].imageOutput && (
+                        <span className="icon">photo_camera</span>
+                      )}
                       {models[key].name}
                     </button>
                   </li>
-                ))}
+                )
+              })}
             </ul>
           </div>
           <div className="label">Model{batchMode ? '' : 's'}</div>
@@ -226,11 +262,12 @@ export default function App() {
           >
             <input
               type="file"
+              accept="image/*"
               ref={imageInputRef}
               onChange={e => handleImageSet(e.target.files[0])}
             />
             <div className="dropZone">
-              {inputImage && <img src={inputImage} />}
+              {inputImage && <img src={inputImage} alt="Input" />}
               Drop here
             </div>
             <div className="label">Input image</div>
@@ -270,30 +307,23 @@ export default function App() {
               <li>
                 <button
                   onClick={() => {
-                    addRound(
-                      presets[Math.floor(Math.random() * presets.length)].prompt
-                    )
+                    const randomPreset =
+                      presets[Math.floor(Math.random() * presets.length)]
+                    addRound(randomPreset.prompt, inputImage)
                     setShowPresets(false)
                   }}
                   className="chip primary"
                 >
-                  <span className="icon">Ifl</span>
+                  <span className="icon">casino</span>
                   Random prompt
                 </button>
               </li>
-
-              {/* <li>
-                <button onClick={shufflePresets} className="chip primary">
-                  <span className="icon">shuffle</span>
-                  Shuffle prompts
-                </button>
-              </li> */}
 
               {presets.map(({label, prompt}) => (
                 <li key={label}>
                   <button
                     onClick={() => {
-                      addRound(prompt)
+                      addRound(prompt, inputImage)
                       setShowPresets(false)
                     }}
                     className="chip"

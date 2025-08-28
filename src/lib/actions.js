@@ -45,6 +45,7 @@ export const addRound = (prompt, promptImage) => {
 
   const newRound = {
     prompt,
+    promptImage,
     systemInstruction: modes[outputMode].systemInstruction,
     id: crypto.randomUUID(),
     createdAt: new Date(),
@@ -69,12 +70,13 @@ export const addRound = (prompt, promptImage) => {
         thinkingCapable: models[output.model].thinkingCapable,
         systemInstruction: isImage ? null : newRound.systemInstruction,
         prompt: isImage
-          ? newRound.systemInstruction + `\n${newRound.prompt}`
+          ? `${newRound.systemInstruction}\n\n${newRound.prompt}`
           : newRound.prompt,
         imageOutput: isImage,
-        promptImage
+        promptImage: newRound.promptImage
       })
     } catch (e) {
+      console.error(e)
       set(state => {
         const round = state.feed.find(round => round.id === newRound.id)
         if (!round) {
@@ -98,12 +100,16 @@ export const addRound = (prompt, promptImage) => {
         return
       }
 
+      const outputData = isImage
+        ? res
+        : res
+            .replace(/```\w+/gm, '')
+            .replace(/```\n?$/gm, '')
+            .trim()
+
       round.outputs[i] = {
         ...output,
-        outputData: res
-          .replace(/```\w+/gm, '')
-          .replace(/```\n?$/gm, '')
-          .trim(),
+        outputData,
         isBusy: false,
         totalTime: Date.now() - output.startTime
       }
@@ -118,6 +124,24 @@ export const addRound = (prompt, promptImage) => {
 export const setOutputMode = mode =>
   set(state => {
     state.outputMode = mode
+
+    // When changing modes, ensure the selected models are compatible.
+    const {batchMode, batchModel} = state
+    const currentBatchModelIsCompatible =
+      mode === 'image'
+        ? models[batchModel].imageOutput
+        : !models[batchModel].imageOutput
+
+    if (batchMode && !currentBatchModelIsCompatible) {
+      const newModel = Object.keys(models).find(key =>
+        mode === 'image'
+          ? models[key].imageOutput
+          : !models[key].imageOutput
+      )
+      if (newModel) {
+        state.batchModel = newModel
+      }
+    }
   })
 
 export const setBatchModel = model =>
@@ -142,6 +166,18 @@ export const setBatchSize = size =>
 export const setVersusModel = (model, active) =>
   set(state => {
     state.versusModels[model] = active
+  })
+
+export const setVersusModels = newModels =>
+  set(state => {
+    Object.keys(state.versusModels).forEach(key => {
+      state.versusModels[key] = false
+    })
+    newModels.forEach(model => {
+      if (state.versusModels.hasOwnProperty(model)) {
+        state.versusModels[model] = true
+      }
+    })
   })
 
 export const removeRound = id =>
