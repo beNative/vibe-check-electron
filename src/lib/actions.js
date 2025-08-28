@@ -68,10 +68,8 @@ export const addRound = (prompt, promptImage) => {
         model: models[output.model].modelString,
         thinking: models[output.model].thinking,
         thinkingCapable: models[output.model].thinkingCapable,
-        systemInstruction: isImage ? null : newRound.systemInstruction,
-        prompt: isImage
-          ? `${newRound.systemInstruction}\n\n${newRound.prompt}`
-          : newRound.prompt,
+        systemInstruction: newRound.systemInstruction,
+        prompt: newRound.prompt,
         imageOutput: isImage,
         promptImage: newRound.promptImage
       })
