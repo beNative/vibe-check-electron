@@ -1,4 +1,3 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -39,15 +38,12 @@ export const addRound = (prompt, promptImage) => {
   scrollTo({top: 0, left: 0, behavior: 'smooth'})
 
   if (prompt) {
-    const {promptHistory} = get()
-    const newHistory = [prompt, ...promptHistory.filter(p => p !== prompt)].slice(
-      0,
-      50
-    )
     set(state => {
-      state.promptHistory = newHistory
+      state.promptHistory = [
+        prompt,
+        ...state.promptHistory.filter(p => p !== prompt)
+      ].slice(0, 50)
     })
-    localStorage.setItem('promptHistory', JSON.stringify(newHistory))
   }
 
   const {outputMode, batchMode, batchSize, batchModel, versusModels} = get()
@@ -244,7 +240,6 @@ export const reset = () => {
 export const clearPromptHistory = () =>
   set(state => {
     state.promptHistory = []
-    localStorage.removeItem('promptHistory')
   })
 
 init()
