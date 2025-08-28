@@ -1,0 +1,31 @@
+{
+  "name": "vibecheck",
+  "version": "1.0.0",
+  "description": "Quickly batch test prompts with visual outputs.",
+  "main": "electron.js",
+  "author": "Dan Motzenbecker",
+  "scripts": {
+    "build:js": "esbuild index.tsx --bundle --outfile=dist/bundle.js --jsx=automatic --loader:.jsx=jsx",
+    "start": "npm run build:js && electron .",
+    "build:win": "npm run build:js && electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^29.1.5",
+    "electron-builder": "^24.13.3",
+    "esbuild": "^0.20.2"
+  },
+  "build": {
+    "appId": "com.danmotzenbecker.vibecheck",
+    "productName": "VibeCheck",
+    "files": [
+      "dist/",
+      "index.html",
+      "index.css",
+      "electron.js",
+      "preload.js"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
