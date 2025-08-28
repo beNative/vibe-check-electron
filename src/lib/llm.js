@@ -44,11 +44,22 @@ export default limitFunction(
           setTimeout(() => reject(new Error('timeout')), timeoutMs)
         )
 
+        const parts = [];
+        if (promptImage) {
+          parts.push({
+            inlineData: {
+              data: promptImage.split(',')[1],
+              mimeType: 'image/png'
+            }
+          });
+        }
+        parts.push({ text: prompt });
+
         const modelPromise = ai.models.generateContent({
           model,
           config: {
             systemInstruction,
-            safetySettings,
+            // safetySettings, // Disabling safety settings for broader creative output
             ...(thinkingCapable && !thinking
               ? {thinkingConfig: {thinkingBudget: 0}}
               : {}),
@@ -56,37 +67,22 @@ export default limitFunction(
               ? {responseModalities: [Modality.TEXT, Modality.IMAGE]}
               : {})
           },
-
-          contents: [
-            {
-              parts: [
-                ...(promptImage
-                  ? [
-                      {
-                        inlineData: {
-                          data: promptImage.split(',')[1],
-                          mimeType: 'image/png'
-                        }
-                      }
-                    ]
-                  : []),
-                {text: prompt}
-              ]
-            }
-          ]
+          contents: [{ parts }]
         })
 
-        return Promise.race([modelPromise, timeoutPromise]).then(res =>
-          imageOutput
-            ? 'data:image/png;base64,' +
-              res.candidates[0].content.parts.find(p => p.inlineData).inlineData
-                .data
-            : res.text
-        )
+        return Promise.race([modelPromise, timeoutPromise]).then(res => {
+          if (imageOutput) {
+            const imagePart = res.candidates[0].content.parts.find(p => p.inlineData);
+            return 'data:image/png;base64,' + imagePart.inlineData.data;
+          }
+          return res.text;
+        });
       } catch (error) {
         if (error.name === 'AbortError') {
           return
         }
+        
+        console.error(`Attempt ${attempt + 1} failed:`, error);
 
         if (attempt === maxRetries - 1) {
           throw error
@@ -95,7 +91,7 @@ export default limitFunction(
         const delay = baseDelay * 2 ** attempt
         await new Promise(res => setTimeout(res, delay))
         console.warn(
-          `Attempt ${attempt + 1} failed, retrying after ${delay}ms...`
+          `Retrying after ${delay}ms...`
         )
       }
     }
