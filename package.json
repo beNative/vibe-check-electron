@@ -7,6 +7,7 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "build:js": "node esbuild.config.cjs",
+    "watch": "node esbuild.config.cjs --watch",
     "start": "npm run build:js && electron .",
     "build:win": "npm run build:js && electron-builder --win"
   },
