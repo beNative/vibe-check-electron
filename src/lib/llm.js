@@ -10,6 +10,7 @@ const maxRetries = 5
 const baseDelay = 1_233
 
 let aiPromise;
+
 const getAi = () => {
   if (!aiPromise) {
     aiPromise = (async () => {
@@ -17,8 +18,7 @@ const getAi = () => {
       // In a regular browser, it'll be undefined and we'll fall back to process.env.API_KEY.
       const apiKey = await window.electron?.getApiKey() || process.env.API_KEY;
       if (!apiKey) {
-        console.error("API key is missing.");
-        throw new Error("API_KEY is not set.");
+        throw new Error("API_KEY is not set. Please set it in your environment.");
       }
       return new GoogleGenAI({apiKey});
     })();
@@ -70,13 +70,18 @@ export default limitFunction(
           contents: [{ parts }]
         })
 
-        return Promise.race([modelPromise, timeoutPromise]).then(res => {
-          if (imageOutput) {
-            const imagePart = res.candidates[0].content.parts.find(p => p.inlineData);
-            return 'data:image/png;base64,' + imagePart.inlineData.data;
+        const res = await Promise.race([modelPromise, timeoutPromise]);
+        
+        if (imageOutput) {
+          const imagePart = res.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+          const imageData = imagePart?.inlineData?.data;
+          if (!imageData) {
+            throw new Error('Image data not found in API response.');
           }
-          return res.text;
-        });
+          return 'data:image/png;base64,' + imageData;
+        }
+        
+        return res.text;
       } catch (error) {
         if (error.name === 'AbortError') {
           return
