@@ -6,10 +6,12 @@
   "author": "Dan Motzenbecker",
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
-    "build:js": "node esbuild.config.cjs",
+    "build": "node esbuild.config.cjs",
     "watch": "node esbuild.config.cjs --watch",
-    "start": "npm run build:js && electron .",
-    "build:win": "npm run build:js && electron-builder --win"
+    "start": "npm run build && electron .",
+    "dev": "concurrently \"npm:watch\" \"electron .\"",
+    "build:win": "npm run build && electron-builder --win",
+    "test:e2e": "npm run build && playwright test"
   },
   "dependencies": {
     "@google/genai": "^1.16.0",
@@ -18,12 +20,14 @@
     "immer": "^10.1.1",
     "lodash.shuffle": "^4.2.0",
     "p-limit": "^7.1.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "react-syntax-highlighter": "^15.6.6",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.42.1",
+    "concurrently": "^8.2.2",
     "electron": "^29.1.5",
     "electron-builder": "^24.13.3",
     "esbuild": "^0.20.2"

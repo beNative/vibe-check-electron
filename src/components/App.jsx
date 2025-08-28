@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -16,7 +17,8 @@ import {
   setBatchSize,
   setVersusModel,
   setVersusModels,
-  reset
+  reset,
+  clearPromptHistory
 } from '../lib/actions'
 import {isTouch, isIframe} from '../lib/consts'
 import FeedItem from './FeedItem'
@@ -29,9 +31,11 @@ export default function App() {
   const versusModels = useStore.use.versusModels()
   const batchMode = useStore.use.batchMode()
   const batchSize = useStore.use.batchSize()
+  const promptHistory = useStore.use.promptHistory()
 
   const [presets, setPresets] = useState([])
   const [showPresets, setShowPresets] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
   const [showModes, setShowModes] = useState(false)
   const [showModels, setShowModels] = useState(false)
   const [inputImage, setInputImage] = useState(null)
@@ -104,6 +108,7 @@ export default function App() {
         setShowModes(false)
         setShowModels(false)
         setShowPresets(false)
+        setShowHistory(false)
       })
     }
   }, [])
@@ -155,6 +160,7 @@ export default function App() {
                   setShowModes(true)
                   setShowModels(false)
                   setShowPresets(false)
+                  setShowHistory(false)
                 }
               : null
           }
@@ -193,6 +199,7 @@ export default function App() {
                   setShowModels(true)
                   setShowModes(false)
                   setShowPresets(false)
+                  setShowHistory(false)
                 }
               : null
           }
@@ -285,6 +292,7 @@ export default function App() {
                   setShowPresets(true)
                   setShowModes(false)
                   setShowModels(false)
+                  setShowHistory(false)
                 }
               : null
           }
@@ -336,6 +344,63 @@ export default function App() {
           </div>
           <div className="label">Prompt</div>
         </div>
+        
+        {promptHistory.length > 0 && (
+          <div
+            className="selectorWrapper"
+            onMouseEnter={!isTouch && (() => setShowHistory(true))}
+            onMouseLeave={!isTouch && (() => setShowHistory(false))}
+            onTouchStart={
+              isTouch
+                ? e => {
+                    e.stopPropagation()
+                    setShowHistory(true)
+                    setShowModes(false)
+                    setShowModels(false)
+                    setShowPresets(false)
+                  }
+                : null
+            }
+          >
+            <button className="resetButton">
+              <span className="icon">history</span>
+            </button>
+            <div
+              className={c('selector', 'historySelector', {
+                active: showHistory
+              })}
+            >
+              <ul>
+                <li>
+                  <button
+                    className="chip primary"
+                    onClick={() => {
+                      clearPromptHistory()
+                      setShowHistory(false)
+                    }}
+                  >
+                    <span className="icon">delete_sweep</span>
+                    Clear
+                  </button>
+                </li>
+                {promptHistory.map((prompt, i) => (
+                  <li key={i}>
+                    <button
+                      className="chip"
+                      onClick={() => {
+                        onModifyPrompt(prompt)
+                        setShowHistory(false)
+                      }}
+                    >
+                      {prompt}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="label">History</div>
+          </div>
+        )}
 
         {batchMode && (
           <div>
@@ -357,7 +422,7 @@ export default function App() {
 
         <div>
           <button
-            className="circleButton resetButton"
+            className="resetButton"
             onClick={() => {
               reset()
               setInputImage(null)
@@ -371,7 +436,7 @@ export default function App() {
 
         {!isIframe && (
           <div>
-            <button className="circleButton resetButton" onClick={toggleTheme}>
+            <button className="resetButton" onClick={toggleTheme}>
               <span className="icon">
                 {isDark ? 'light_mode' : 'dark_mode'}
               </span>

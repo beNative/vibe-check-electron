@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -14,6 +15,7 @@ export default createSelectorFunctions(
     immer(() => ({
       didInit: false,
       feed: [],
+      promptHistory: JSON.parse(localStorage.getItem('promptHistory')) || [],
       outputMode: Object.keys(modes)[0],
       batchMode: true,
       batchSize: 3,
