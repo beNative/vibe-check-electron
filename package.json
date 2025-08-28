@@ -6,7 +6,7 @@
   "author": "Dan Motzenbecker",
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
-    "build:js": "esbuild index.tsx --bundle --outfile=dist/bundle.js --jsx=automatic --loader:.jsx=jsx",
+    "build:js": "node esbuild.config.cjs",
     "start": "npm run build:js && electron .",
     "build:win": "npm run build:js && electron-builder --win"
   },
@@ -17,8 +17,8 @@
     "immer": "^10.1.1",
     "lodash.shuffle": "^4.2.0",
     "p-limit": "^7.1.1",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-syntax-highlighter": "^15.6.6",
     "zustand": "^5.0.8"
   },
@@ -33,7 +33,7 @@
     "files": [
       "dist/",
       "index.html",
-      "index.css",
+      "main.css",
       "electron.js",
       "preload.js"
     ],
