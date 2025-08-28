@@ -135,22 +135,61 @@ export const addRound = (prompt, promptImage) => {
 export const setOutputMode = mode =>
   set(state => {
     state.outputMode = mode
+    const isImageMode = mode === 'image'
+
+    // Image mode is only supported in Batch mode. Switch if necessary.
+    if (isImageMode && !state.batchMode) {
+      state.batchMode = true
+    }
 
     // When changing modes, ensure the selected models are compatible.
-    const {batchMode, batchModel} = state
-    const currentBatchModelIsCompatible =
-      mode === 'image'
+    const {batchMode, batchModel, versusModels} = state
+
+    if (batchMode) {
+      const currentBatchModelIsCompatible = isImageMode
         ? models[batchModel].imageOutput
         : !models[batchModel].imageOutput
 
-    if (batchMode && !currentBatchModelIsCompatible) {
-      const newModel = Object.keys(models).find(key =>
-        mode === 'image'
-          ? models[key].imageOutput
-          : !models[key].imageOutput
-      )
-      if (newModel) {
-        state.batchModel = newModel
+      if (!currentBatchModelIsCompatible) {
+        const newModel = Object.keys(models).find(key =>
+          isImageMode
+            ? models[key].imageOutput
+            : !models[key].imageOutput
+        )
+        if (newModel) {
+          state.batchModel = newModel
+        }
+      }
+    } else {
+      // Versus mode. Deselect any incompatible models.
+      let anyModelSelected = false
+      Object.keys(versusModels).forEach(modelKey => {
+        const model = models[modelKey]
+        const modelIsCompatible = isImageMode
+          ? model.imageOutput
+          : !model.imageOutput
+
+        if (!modelIsCompatible) {
+          state.versusModels[modelKey] = false
+        }
+        // Check selection status *after* potentially deselecting it.
+        if (state.versusModels[modelKey]) {
+          anyModelSelected = true
+        }
+      })
+
+      // If no models are selected after filtering, select a compatible default.
+      if (!anyModelSelected) {
+        // Since we are in Versus mode, we are looking for a non-image model.
+        const firstCompatibleModel = Object.keys(models).find(
+          key => !models[key].imageOutput
+        )
+        if (
+          firstCompatibleModel &&
+          state.versusModels.hasOwnProperty(firstCompatibleModel)
+        ) {
+          state.versusModels[firstCompatibleModel] = true
+        }
       }
     }
   })
