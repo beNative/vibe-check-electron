@@ -5,9 +5,22 @@
   "main": "electron.js",
   "author": "Dan Motzenbecker",
   "scripts": {
+    "postinstall": "electron-builder install-app-deps",
     "build:js": "esbuild index.tsx --bundle --outfile=dist/bundle.js --jsx=automatic --loader:.jsx=jsx",
     "start": "npm run build:js && electron .",
     "build:win": "npm run build:js && electron-builder --win"
+  },
+  "dependencies": {
+    "@google/genai": "^1.16.0",
+    "auto-zustand-selectors-hook": "^3.0.1",
+    "clsx": "^2.1.1",
+    "immer": "^10.1.1",
+    "lodash.shuffle": "^4.2.0",
+    "p-limit": "^7.1.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-syntax-highlighter": "^15.6.6",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "electron": "^29.1.5",

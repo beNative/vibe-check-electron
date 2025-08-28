@@ -3,14 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 export default {
-  lite: {
-    name: 'Flash-Lite',
-    version: '2.5',
-    modelString: 'gemini-2.5-flash-lite',
-    shortName: 'Lite',
-    thinkingCapable: false,
-    thinking: false
-  },
   flash: {
     name: 'Flash (thinking off)',
     version: '2.5',
@@ -27,19 +19,11 @@ export default {
     thinkingCapable: true,
     thinking: true
   },
-  pro: {
-    name: 'Pro',
+  imageEditor: {
+    name: 'Image Editor',
     version: '2.5',
-    modelString: 'gemini-2.5-pro',
-    shortName: 'Pro',
-    thinkingCapable: true,
-    thinking: true
-  },
-  flashImage: {
-    name: 'Flash Image',
-    version: '2.0',
-    modelString: 'gemini-2.0-flash-preview-image-generation',
-    shortName: 'Flash Image',
+    modelString: 'gemini-2.5-flash-image-preview',
+    shortName: 'Image Editor',
     thinkingCapable: false,
     thinking: false,
     imageOutput: true
